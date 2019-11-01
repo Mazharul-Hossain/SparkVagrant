@@ -76,14 +76,14 @@ Vagrant.configure("2") do |config|
       vb.memory = "1024"
       vb.cpus = 1
     end
-    subconfig.vm.provision "shell", inline: <<-SHELL
-      apt-get update
-      apt-get upgrade -y
-      apt-get update
-      apt-get install -y git
-      apt-get install -y git tree 
+    #subconfig.vm.provision "shell", inline: <<-SHELL
+    #  apt-get update
+    #  apt-get upgrade -y
+    #  apt-get update
+    #  apt-get install -y git
+    #  apt-get install -y git tree 
       #   apt-get install -y apache2
-    SHELL
+    #SHELL
   end
   
   config.vm.define "slave" do |subconfig|
@@ -97,14 +97,14 @@ Vagrant.configure("2") do |config|
       vb.memory = "1024"
       vb.cpus = 1
     end
-    subconfig.vm.provision "shell", inline: <<-SHELL
-      apt-get update
-      apt-get upgrade -y
-      apt-get update
-      apt-get install -y git
-      apt-get install -y git tree 
+    #subconfig.vm.provision "shell", inline: <<-SHELL
+    #  apt-get update
+    #  apt-get upgrade -y
+    #  apt-get update
+    #  apt-get install -y git
+    #  apt-get install -y git tree 
       #   apt-get install -y apache2
-    SHELL
+    #SHELL
   end
   # config.vm.provision "shell", inline: <<-SHELL
   #   apt-get update
