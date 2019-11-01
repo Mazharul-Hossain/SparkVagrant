@@ -9,3 +9,7 @@ up-provision:
 
 destroy:
 	vagrant destroy
+
+status:
+	vagrant status
+	vagrant ssh-config 	
