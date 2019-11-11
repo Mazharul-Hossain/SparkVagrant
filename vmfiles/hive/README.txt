@@ -7,7 +7,7 @@ processes running in the virtual machine:
 
 Since the metastore & tables are on the Vagrant shared folder, they will be 
 preserved accross VM reinstallations. Folder contents should not be 
-modified outside Spark.
+modified outside Spark. 
 
 Note that Spark uses this directory because it has been configured that way by
 the Hive configuration file in /opt/spark/current/conf/hive-site.xml. It can
