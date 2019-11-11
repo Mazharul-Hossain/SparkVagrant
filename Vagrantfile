@@ -47,11 +47,11 @@ spark_mode = 'local'
 
 # [A] The location of the cluster master (the YARN Resource Manager in Yarn 
 # mode, or the Spark master in standalone mode)
-# spark_master = 'samson02.hi.inet'
+spark_master = 'samson02.hi.inet'
 # [B] The host running the HDFS namenode
-# spark_namenode = 'samson01.hi.inet'
+spark_namenode = 'samson01.hi.inet'
 # [C] The location of the Spark History Server
-# spark_history_server = 'samson03.hi.inet:18080'
+spark_history_server = 'samson03.hi.inet:18080'
 # ------------------
 
 
@@ -448,7 +448,9 @@ EOF
     privileged: true,
     keep_color: true,    
     args: [ vm_username,
-            spark_mode, spark_master, spark_namenode, spark_history_server ],
+            spark_mode, spark_master],
+    #args: [ vm_username,
+    #        spark_mode, spark_master, spark_namenode, spark_history_server ],
     inline: <<-SHELL
      # Link the IPython mgr script so that it can be found by root
      SCR=jupyter-notebook-mgr
