@@ -34,7 +34,7 @@ port_nb = 8008
 # available: "local", "yarn", "standalone"
 # It can be changed at runtime by executing inside the virtual machine, as 
 # root user, "service notebook set-mode <mode>"
-spark_mode = 'standalone'
+spark_mode = 'local'
 
 # -----------------
 # These 3 options are used only when running non-local tasks. They define
@@ -47,11 +47,11 @@ spark_mode = 'standalone'
 
 # [A] The location of the cluster master (the YARN Resource Manager in Yarn 
 # mode, or the Spark master in standalone mode)
-spark_master = 'samson02.hi.inet'
+# spark_master = 'samson02.hi.inet'
 # [B] The host running the HDFS namenode
-spark_namenode = 'samson01.hi.inet'
+# spark_namenode = 'samson01.hi.inet'
 # [C] The location of the Spark History Server
-spark_history_server = 'samson03.hi.inet:18080'
+# spark_history_server = 'samson03.hi.inet:18080'
 # ------------------
 
 
@@ -728,4 +728,5 @@ EOF
 
 end
 
-# jupyter notebook: ssh -N -L localhost:8008:141.225.9.171:8008 mazhar
+# jupyter notebook: 
+# ssh -N -L localhost:8008:141.225.9.171:8008 mazhar@141.225.9.171
