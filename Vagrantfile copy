@@ -20,7 +20,7 @@ vm_password = 'password'
 # (if remote (yarn) mode is ever going to be used, it is advisable to change
 # it to a recognizable unique name, so that it is easily identified in the
 # server logs)
-vm_username = 'vagrant'
+vm_username = 'vm_spark_user'
 
 # The virtual machine exports the port where the notebook process by
 # forwarding it to this port of the local machine
@@ -34,7 +34,7 @@ port_nb = 8008
 # available: "local", "yarn", "standalone"
 # It can be changed at runtime by executing inside the virtual machine, as 
 # root user, "service notebook set-mode <mode>"
-spark_mode = 'standalone'
+spark_mode = 'local'
 
 # -----------------
 # These 3 options are used only when running non-local tasks. They define
@@ -312,7 +312,7 @@ c.NotebookApp.port = $3
 c.NotebookApp.password = u'$PASS'
 c.NotebookApp.open_browser = False
 c.NotebookApp.log_level = 'INFO'
-c.NotebookApp.notebook_dir = u'/vagrant/IPNB'
+c.NotebookApp.notebook_dir = u'/home/$USERNAME/IPNB'
 # Preload matplotlib
 c.IPKernelApp.matplotlib = 'inline'
 # Kernel heartbeat interval in seconds.
@@ -716,16 +716,14 @@ EOF
     # this way it works.
     # [An alternative would be to force mounting on startup, by adding the
     # vboxsf mount point to /etc/fstab during provisioning]
-    vgrml.vm.provision "50.nbstart", 
-      type: "shell", 
-      run: "always",
-      privileged: true,
-      keep_color: true,    
-      inline: "systemctl start notebook"
+    #vgrml.vm.provision "50.nbstart", 
+    #  type: "shell", 
+    #  run: "always",
+    #  privileged: true,
+    #  keep_color: true,    
+    #  inline: "systemctl start notebook; systemctl status notebook.service; journalctl -xe"
 
   end # config.vm.define
 
 
 end
-
-# jupyter notebook: ssh -N -L localhost:8008:141.225.9.171:8008 mazhar
