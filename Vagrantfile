@@ -1,3 +1,11 @@
+################################################################
+# Change list: [Nov 11, 2019]
+# spark_mode = 'standalone' or 'local'
+# spark_master = 'spark://vgr-ipnb-spark:7077'
+# vgrml.vm.hostname = "vgr-ipnb-spark-n01" for workers 
+#                     "vgr-ipnb-spark"     for master
+################################################################
+
 # -*- mode: ruby;  ruby-indent-tabs-mode: t -*-
 # vi: set ft=ruby :
 # **************************************************************************
@@ -34,7 +42,7 @@ port_nb = 8008
 # available: "local", "yarn", "standalone"
 # It can be changed at runtime by executing inside the virtual machine, as 
 # root user, "service notebook set-mode <mode>"
-spark_mode = 'local'
+spark_mode = 'standalone'
 
 # -----------------
 # These 3 options are used only when running non-local tasks. They define
@@ -47,7 +55,7 @@ spark_mode = 'local'
 
 # [A] The location of the cluster master (the YARN Resource Manager in Yarn 
 # mode, or the Spark master in standalone mode)
-spark_master = 'samson02.hi.inet'
+spark_master = 'spark://vgr-ipnb-spark:7077'
 # [B] The host running the HDFS namenode
 spark_namenode = 'samson01.hi.inet'
 # [C] The location of the Spark History Server
@@ -147,7 +155,8 @@ Vagrant.configure(2) do |config|
     #auto_mount: false
   
     # Customize the virtual machine: set hostname & allocated RAM
-    vgrml.vm.hostname = "vgr-ipnb-spark"
+    # vgrml.vm.hostname = "vgr-ipnb-spark"
+    vgrml.vm.hostname = "vgr-ipnb-spark-n01"
     vgrml.vm.provider :virtualbox do |vb|
       # Set the hostname in VirtualBox
       vb.name = vgrml.vm.hostname.to_s
@@ -183,6 +192,12 @@ Vagrant.configure(2) do |config|
      auto_correct: true
     # Spark driver UI for the 2nd application (e.g. a command-line job)
     vgrml.vm.network :forwarded_port, host: 4041, guest: 4041,
+     auto_correct: true        
+    # Spark master UI 
+    vgrml.vm.network :forwarded_port, host: 7077, guest: 7077, 
+     auto_correct: true
+    # Spark master UI 
+    vgrml.vm.network :forwarded_port, host: 8080, guest: 8080, 
      auto_correct: true
 
     # RStudio server
