@@ -4,6 +4,7 @@
 # spark_master = 'spark://vgr-ipnb-spark:7077'
 # vgrml.vm.hostname = "vgr-ipnb-spark-n01" for workers 
 #                     "vgr-ipnb-spark"     for master
+# config.vm.define "vm-spark-nb64" do |vgrml|
 ################################################################
 
 # -*- mode: ruby;  ruby-indent-tabs-mode: t -*-
@@ -124,7 +125,7 @@ Vagrant.configure(2) do |config|
 
   config.vm.box_download_insecure = true
 
-  config.vm.define "vm-spark-nb64" do |vgrml|
+  config.vm.define "vm-spark-n01" do |vgrml|
 
     #config.name = "vgr-pyspark"
 
