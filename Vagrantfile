@@ -185,7 +185,7 @@ Vagrant.configure(2) do |config|
     # ---- NAT interface ----
     # NAT port forwarding
     vgrml.vm.network :forwarded_port, 
-     #auto_correct: true,
+     auto_correct: true,
      guest: port_nb_internal,
      host: port_nb                  # Notebook UI
     # Spark driver UI
