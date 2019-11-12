@@ -203,11 +203,13 @@ Vagrant.configure(2) do |config|
 
     # RStudio server
     # =====> uncomment if using RStudio
-    vgrml.vm.network :forwarded_port, host: 8787, guest: 8787
+    vgrml.vm.network :forwarded_port, host: 8787, guest: 8787, 
+     auto_correct: true
 
     # Quiver
     # =====> uncomment if using Quiver visualization for Keras
-    #vgrml.vm.network :forwarded_port, host: 5000, guest: 5000
+    #vgrml.vm.network :forwarded_port, host: 5000, guest: 5000, 
+    # auto_correct: true
 
     # In case we want to fix Spark ports
     #vgrml.vm.network :forwarded_port, host: 9234, guest: 9234
