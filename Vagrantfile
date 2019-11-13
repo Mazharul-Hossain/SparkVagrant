@@ -18,13 +18,8 @@
 # Variables defining the configuration of Spark & notebook 
 # Modify as needed
 
-# RAM memory used for the VM, in MB
-vm_memory = '2048'
-# Number of CPU cores assigned to the VM
-vm_cpus = '1'
-
 # Password to use to access the Notebook web interface 
-vm_password = 'password'
+vm_password = 'password'    # for jupyter notebook
 
 # Username that will run all spark processes.
 # (if remote (yarn) mode is ever going to be used, it is advisable to change
@@ -110,8 +105,9 @@ port_nb_internal = 8008
 VAGRANTFILE_API_VERSION = "2"
 
 cluster = {
-  "master" => { :ip => "192.72.33.101"},
-  "n01" => { :ip => "192.72.33.102"}
+  "master" => { :ip => "192.72.33.101", :core => 2, :mem => 4096},
+  "n01" => { :ip => "192.72.33.102", :core => 1, :mem => 2048},
+  "n02" => { :ip => "192.72.33.103", :core => 1, :mem => 2048}
 }
  
 Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
@@ -153,9 +149,9 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
         # Set the hostname in VirtualBox
         vb.name = subconfig.vm.hostname.to_s
         # Customize the amount of memory on the VM
-        vb.memory = vm_memory
+        vb.memory = info[:mem]
         # Set the number of CPUs
-        vb.cpus = vm_cpus
+        vb.cpus = info[:core]
         # Display the VirtualBox GUI when booting the machine
         #vb.gui = true
         vb.customize [ "guestproperty", "set", :id,
@@ -744,8 +740,8 @@ EOF
           inline: "systemctl start notebook"
       end
 
-      if hostname == "master"
-        subconfig.vm.provision "58.spark-master-worker",
+      if hostname == "master-worker"
+        subconfig.vm.provision "57.spark-master-worker",
         type: "shell",
         privileged: false,
         keep_color: true,
@@ -762,6 +758,21 @@ EOF
             send "vagrant\r"
             expect eof        
         SHELL
+      end
+      if hostname == "master"
+        subconfig.vm.provision "58.spark-master",
+        type: "shell",
+        privileged: false,
+        keep_color: true,
+        args: [ spark_basedir, spark_master ],
+        inline: <<-SHELL
+          cd $1/current
+          
+          echo SPARK_MASTER_HOST=$2 >> conf/spark-env.sh 
+          
+          echo "Starting master"
+          ./sbin/start-master.sh         
+        SHELL
       
       else
         subconfig.vm.provision "59.spark-worker",
@@ -775,7 +786,7 @@ EOF
           ./sbin/start-slave.sh spark://$2:7077
         SHELL
       
-      end # if hostname == "master" for starting master and slave 
+      end # if hostname == "master-worker" for starting master and slave 
 
     end # config.vm.define
 
