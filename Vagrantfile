@@ -51,7 +51,7 @@ spark_mode = 'local'
 
 # [A] The location of the cluster master (the YARN Resource Manager in Yarn 
 # mode, or the Spark master in standalone mode)
-spark_master = '192.72.33.101'
+spark_master = '192.72.33.100'
 # [B] The host running the HDFS namenode
 spark_namenode = 'samson01.hi.inet'
 # [C] The location of the Spark History Server
@@ -105,9 +105,12 @@ port_nb_internal = 8008
 VAGRANTFILE_API_VERSION = "2"
 
 cluster = {
-  "master" => { :ip => "192.72.33.101", :core => 2, :mem => 4096},
-  "n01" => { :ip => "192.72.33.102", :core => 1, :mem => 2048},
-  "n02" => { :ip => "192.72.33.103", :core => 1, :mem => 2048}
+#  "master" => { :ip => "192.72.33.100", :core => 4, :mem => 16384},
+  "master" => { :ip => "192.72.33.100", :core => 1, :mem => 2048},
+  "n01" => { :ip => "192.72.33.101", :core => 1, :mem => 3072},
+  "n02" => { :ip => "192.72.33.102", :core => 1, :mem => 3072},
+#  "n03" => { :ip => "192.72.33.103", :core => 1, :mem => 3072},
+#  "n04" => { :ip => "192.72.33.104", :core => 1, :mem => 3072}
 }
  
 Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
@@ -722,6 +725,62 @@ EOF
 
       # *************************************************************************
 
+      # https://stackoverflow.com/a/43407442/2049763
+      # SPARK_EXECUTOR_MEMORY=4g
+
+      if hostname == "master-worker"
+        subconfig.vm.provision "57.spark-master-worker",
+        type: "shell",
+        privileged: false,
+        keep_color: true,
+        args: [ spark_basedir, spark_master ],
+        inline: <<-SHELL
+          cd $1/current
+          
+          echo SPARK_MASTER_HOST=$2 >> conf/spark-env.sh 
+          echo SPARK_EXECUTOR_MEMORY=2g >> conf/spark-env.sh
+
+          echo "Starting master-workers"
+          expect <<END 
+            spawn ./sbin/start-all.sh
+            expect "vagrant@localhost's password: "
+            send "vagrant\r"
+            expect eof        
+        SHELL
+      end
+      if hostname == "master"
+        subconfig.vm.provision "58.spark-master",
+        type: "shell",
+        privileged: false,
+        keep_color: true,
+        args: [ spark_basedir, spark_master, info[:ip] ],
+        inline: <<-SHELL
+          cd $1/current
+          
+          echo SPARK_MASTER_HOST=$2 >> conf/spark-env.sh
+          # echo SPARK_LOCAL_IP=$3 >> conf/spark-env.sh 
+          
+          echo "Starting master"
+          ./sbin/start-master.sh         
+        SHELL
+      
+      else
+        subconfig.vm.provision "59.spark-worker",
+        type: "shell",
+        privileged: false,
+        keep_color: true,
+        args: [ spark_basedir, spark_master, info[:ip] ],
+        inline: <<-SHELL
+          echo "Starting workers"
+          
+          cd $1/current       
+          echo SPARK_EXECUTOR_MEMORY=2g >> conf/spark-env.sh
+          # echo SPARK_LOCAL_IP=$3 >> conf/spark-env.sh 
+          ./sbin/start-slave.sh spark://$2:7077
+        SHELL
+      
+      end # if hostname == "master-worker" for starting master and slave 
+
       if hostname == "master"
         # .........................................
         # Start Jupyter Notebook
@@ -739,54 +798,6 @@ EOF
           keep_color: true,    
           inline: "systemctl start notebook"
       end
-
-      if hostname == "master-worker"
-        subconfig.vm.provision "57.spark-master-worker",
-        type: "shell",
-        privileged: false,
-        keep_color: true,
-        args: [ spark_basedir, spark_master ],
-        inline: <<-SHELL
-          cd $1/current
-          
-          echo SPARK_MASTER_HOST=$2 >> conf/spark-env.sh 
-
-          echo "Starting master-workers"
-          expect <<END 
-            spawn ./sbin/start-all.sh
-            expect "vagrant@localhost's password: "
-            send "vagrant\r"
-            expect eof        
-        SHELL
-      end
-      if hostname == "master"
-        subconfig.vm.provision "58.spark-master",
-        type: "shell",
-        privileged: false,
-        keep_color: true,
-        args: [ spark_basedir, spark_master ],
-        inline: <<-SHELL
-          cd $1/current
-          
-          echo SPARK_MASTER_HOST=$2 >> conf/spark-env.sh 
-          
-          echo "Starting master"
-          ./sbin/start-master.sh         
-        SHELL
-      
-      else
-        subconfig.vm.provision "59.spark-worker",
-        type: "shell",
-        privileged: false,
-        keep_color: true,
-        args: [ spark_basedir, spark_master ],
-        inline: <<-SHELL
-          echo "Starting workers"
-          cd $1/current        
-          ./sbin/start-slave.sh spark://$2:7077
-        SHELL
-      
-      end # if hostname == "master-worker" for starting master and slave 
 
     end # config.vm.define
 
