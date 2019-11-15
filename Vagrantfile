@@ -1,9 +1,10 @@
 ####################################################################
+# please don't run it without changing cluster information
 # git reset -- hard # in case of conflict just kill all your changes, changes will be localhost
 # git pull 
 #
 # make down             # shutdown vm 
-# make destroy          # if error occurs 
+# make destroy          # if error occurs destroy everything we can start clean
 # make up-provision     # to apply changes to vm
 # make up               # just to make a restart 
 ####################################################################
@@ -106,11 +107,15 @@ VAGRANTFILE_API_VERSION = "2"
 
 cluster = {
 #  "master" => { :ip => "192.72.33.100", :core => 4, :mem => 16384},
-  "master" => { :ip => "192.72.33.100", :core => 1, :mem => 2048},
-  "n01" => { :ip => "192.72.33.101", :core => 1, :mem => 3072},
-  "n02" => { :ip => "192.72.33.102", :core => 1, :mem => 3072},
-#  "n03" => { :ip => "192.72.33.103", :core => 1, :mem => 3072},
-#  "n04" => { :ip => "192.72.33.104", :core => 1, :mem => 3072}
+  "master" => { :ip => "192.72.33.100", :core => 1, :mem => 4096},
+  "n01" => { :ip => "192.72.33.101", :core => 1, :mem => 4096},
+  "n02" => { :ip => "192.72.33.102", :core => 1, :mem => 4096},
+  "n03" => { :ip => "192.72.33.103", :core => 1, :mem => 4096},
+  "n04" => { :ip => "192.72.33.104", :core => 1, :mem => 4096},
+  #"n05" => { :ip => "192.72.33.104", :core => 1, :mem => 4096},
+  #"n06" => { :ip => "192.72.33.104", :core => 1, :mem => 4096},
+  #"n07" => { :ip => "192.72.33.104", :core => 1, :mem => 4096},
+  #"n08" => { :ip => "192.72.33.104", :core => 1, :mem => 4096}
 }
  
 Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
@@ -238,6 +243,14 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
       # using a specific IP.
       subconfig.vm.network "private_network", ip: "#{info[:ip]}"
 
+      subconfig.vm.provision "70.Update to local timezone",
+      type: "shell", 
+      privileged: true,
+      inline: <<-SHELL 
+        sudo rm /etc/localtime 
+        sudo ln -s /usr/share/zoneinfo/America/Chicago /etc/localtime
+      SHELL
+      
       if hostname == "master"
         subconfig.vm.provision "60.install_expect",
         type: "shell", 
@@ -248,6 +261,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
           apt-get install -y expect
         SHELL
       end
+      
       if hostname == "master"
         # **********************************************************************
         # Provisioning: install Spark configuration files and startup scripts
@@ -738,7 +752,7 @@ EOF
           cd $1/current
           
           echo SPARK_MASTER_HOST=$2 >> conf/spark-env.sh 
-          echo SPARK_EXECUTOR_MEMORY=2g >> conf/spark-env.sh
+          # echo SPARK_EXECUTOR_MEMORY=2g >> conf/spark-env.sh
 
           echo "Starting master-workers"
           expect <<END 
@@ -774,8 +788,8 @@ EOF
           echo "Starting workers"
           
           cd $1/current       
-          echo SPARK_EXECUTOR_MEMORY=2g >> conf/spark-env.sh
-          # echo SPARK_LOCAL_IP=$3 >> conf/spark-env.sh 
+          # echo SPARK_EXECUTOR_MEMORY=2g >> conf/spark-env.sh
+          echo SPARK_LOCAL_IP=$3 >> conf/spark-env.sh 
           ./sbin/start-slave.sh spark://$2:7077
         SHELL
       
