@@ -1,0 +1,38 @@
+/*TPCD DATABASE FOR OS PERFORMANCE TESTING*/  
+
+SELECT count(*) FROM tpcd.dss_customer; /*150000 rows*/  
+SELECT * FROM tpcd.dss_customer; /* 4 sec*/ 
+SELECT count(*) FROM tpcd.dss_lineitem; /*5998391 rows*/
+SELECT * FROM tpcd.dss_lineitem; /* 57 sec*/
+SELECT count(*) FROM tpcd.dss_nation; /*25 rows*/
+SELECT * FROM tpcd.dss_nation; /*0.01 sec*/
+SELECT count(*) FROM tpcd.dss_order; /*1500000 rows*/
+SELECT * FROM tpcd.dss_order; /*16 sec*/
+SELECT count(*) FROM tpcd.dss_part; /*200000 rows*/
+SELECT * FROM tpcd.dss_part; /*3.1  sec*/
+SELECT count(*) FROM tpcd.dss_partsupp; /*800000 rows*/
+SELECT * FROM tpcd.dss_partsupp; /* 10.8 sec*/
+SELECT count(*) FROM tpcd.dss_region; /*5 rows*/
+SELECT * FROM tpcd.dss_region; /* 0.0 sec*/
+SELECT count(*) FROM tpcd.dss_supplier; /*10000 rows*/
+SELECT * FROM tpcd.dss_supplier; /* 1.34 sec*/
+
+/* AGGREGATE QUERIES */
+
+SELECT o_custkey, sum(o_totalprice) FROM tpcd.dss_order
+group by o_custkey; 	/* 7 sec */
+
+SELECT * FROM tpcd.dss_order
+ORDER BY o_orderdate DESC; /* 500 sec */
+
+SELECT * FROM tpcd.dss_lineitem
+order by l_shipdate desc; /* sec */
+
+/* INNER JOIN */
+use tpcd
+
+select dss_order.o_custkey, dss_order.o_totalprice , dss_customer.c_name,
+dss_customer.c_address,dss_customer.c_nationkey,dss_customer.c_phone
+FROM dss_order
+INNER JOIN dss_customer ON dss_order.o_custkey = dss_customer.c_custkey 
+order by c_nationkey desc;  /*  623 sec */
