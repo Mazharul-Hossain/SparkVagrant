@@ -754,6 +754,8 @@ EOF
           echo SPARK_MASTER_HOST=$2 >> conf/spark-env.sh 
           # echo SPARK_EXECUTOR_MEMORY=2g >> conf/spark-env.sh
 
+          cp /vagrant/mysql-connector-java/* ./jars/
+
           echo "Starting master-workers"
           expect <<END 
             spawn ./sbin/start-all.sh
@@ -776,7 +778,7 @@ EOF
 
           cp /vagrant/mysql-connector-java/* ./jars/
           
-          echo "Starting master"
+          echo "**** Starting master ****"
           ./sbin/start-master.sh         
         SHELL
       
@@ -792,6 +794,9 @@ EOF
           cd $1/current       
           # echo SPARK_EXECUTOR_MEMORY=2g >> conf/spark-env.sh
           echo SPARK_LOCAL_IP=$3 >> conf/spark-env.sh 
+          
+          cp /vagrant/mysql-connector-java/* ./jars/
+
           ./sbin/start-slave.sh spark://$2:7077
         SHELL
       
