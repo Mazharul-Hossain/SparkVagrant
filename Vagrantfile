@@ -773,6 +773,8 @@ EOF
           
           echo SPARK_MASTER_HOST=$2 >> conf/spark-env.sh
           # echo SPARK_LOCAL_IP=$3 >> conf/spark-env.sh 
+
+          cp /vagrant/mysql-connector-java/* ./jars/
           
           echo "Starting master"
           ./sbin/start-master.sh         
